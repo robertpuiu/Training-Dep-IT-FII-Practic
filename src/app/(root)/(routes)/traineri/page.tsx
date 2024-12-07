@@ -14,7 +14,7 @@ const TrainersPage: FC = async () => {
             <CardContent>
               <div className="flex justify-center p-0">
                 <Image
-                  src={`/trainers/${trainer.name.toLowerCase().trim().split(" ").join("-").trim().replaceAll("ă", "a").replaceAll("î", "i").replaceAll("â", "a").replaceAll("ș", "s").replaceAll("ț", "t")}.png`}
+                  src={`/trainers/${trainer.name.toLowerCase().trim().split(" ").filter(e => e!="").join("-").trim().replaceAll("ă", "a").replaceAll("î", "i").replaceAll("â", "a").replaceAll("ș", "s").replaceAll("ț", "t")}.png`}
                   alt={`Picture of ${trainer.name}`}
                   width={150}
                   height={150}
