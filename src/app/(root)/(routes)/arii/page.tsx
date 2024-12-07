@@ -11,6 +11,10 @@ async function fetchAreas() {
   return response.json();
 }
 
+function parse(t: string){
+  return t.replace(/\s+/g, "").toLowerCase();
+}
+
 const AreasPage: FC = async () => {
   let areas = [];
   try {
@@ -25,7 +29,7 @@ const AreasPage: FC = async () => {
           <CardHeader>
             <CardTitle>{area.name}</CardTitle> {/* Replace 'name' with the correct field */}
             <CardContent>
-              <Image src={area.imageUrl} width={125} height={125} /> 
+              <Image src={"/arii/" + parse(area.name)+ ".png"} width={125} height={125} /> 
             </CardContent>
           </CardHeader>
         </Card>
