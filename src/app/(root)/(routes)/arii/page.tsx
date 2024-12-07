@@ -25,11 +25,12 @@ const AreasPage: FC = async () => {
   return (
     <div className="grid md:grid-cols-2 gap-4 grid-cols-1 p-4">
       {areas.map((area: any, index: number) => (
-        <Card key={index}>
+        <Card key={index} >
           <CardHeader>
-            <CardTitle>{area.name}</CardTitle> {/* Replace 'name' with the correct field */}
-            <CardContent>
+            <CardTitle className="tracking-tight text-2xl font-semibold flex justify-center">{area.name}</CardTitle> {/* Replace 'name' with the correct field */}
+            <CardContent className="flex justify-center p-0">
               <Image src={"/arii/" + parse(area.name)+ ".png"} width={125} height={125} /> 
+
             </CardContent>
           </CardHeader>
         </Card>
