@@ -8,11 +8,11 @@ const TrainersPage: FC = async () => {
     return trainer.name.toLowerCase().replaceAll(" ", "-").replace("ă", "a").replace("î", "i").replace("â", "a").replace("ș", "s").replace("ț", "t");
   }))
   return (
-    <div> 
+    <div className="grid md:grid-cols-2 gap-4 grid-cols-1 p-4"> 
       {trainers.map((trainer: any) => (
-          <Card key={trainer.id} className="p-4">
+          <Card key={trainer.id} className="flex flex-col space-y-1.5 p-6">
             <CardContent>
-              <div className="flex flex-col items-center text-center">
+              <div className="flex justify-center p-0">
                 <Image
                   src={`/trainers/${trainer.name.toLowerCase().trim().split(" ").join("-").trim().replaceAll("ă", "a").replaceAll("î", "i").replaceAll("â", "a").replaceAll("ș", "s").replaceAll("ț", "t")}.png`}
                   alt={`Picture of ${trainer.name}`}
