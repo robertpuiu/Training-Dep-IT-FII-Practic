@@ -1,0 +1,136 @@
+# Workflow created by Valentin Stamate
+# Email: stamatevalentin125@gmail.com
+# Date: 11.02.2024
+
+name: Github Release
+
+on:
+  release:
+    types:
+      - created
+
+env:
+  tag: ${{ github.event.release.tag_name }}
+
+jobs:
+  build_and_deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create .env for Build
+        run: |
+          echo "APP_IMAGE_TAG=ghcr.io/asii-projects/fiipractic-app:${{ env.tag }}" >> .env
+          echo "APP_PORT=${{ secrets.APP_PORT }}" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
+          echo "NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}" >> .env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
+          echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> .env
+          echo "SMTP_SECURE=${{ secrets.SMTP_SECURE }}" >> .env
+          echo "SMTP_HOST=${{ secrets.SMTP_HOST }}" >> .env
+          echo "SMTP_PORT=${{ secrets.SMTP_PORT }}" >> .env
+          echo "SMTP_USER=${{ secrets.SMTP_USER }}" >> .env
+          echo "SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}" >> .env
+          echo "SMTP_FROM=${{ secrets.SMTP_FROM }}" >> .env
+          echo "SMSO_API_KEY=${{ secrets.SMSO_API_KEY }}" >> .env
+          echo "UPSTASH_URL=${{ secrets.UPSTASH_URL }}" >> .env
+          echo "QSTASH_TOKEN=${{ secrets.QSTASH_TOKEN }}" >> .env
+          echo "QSTASH_CURRENT_SIGNING_KEY=${{ secrets.QSTASH_CURRENT_SIGNING_KEY }}" >> .env
+          echo "QSTASH_NEXT_SIGNING_KEY=${{ secrets.QSTASH_NEXT_SIGNING_KEY }}" >> .env
+          echo "QSTASH_TOPIC=${{ secrets.QSTASH_TOPIC }}" >> .env
+          echo "DISCORD_CLIENT_ID=${{ secrets.DISCORD_CLIENT_ID }}" >> .env
+          echo "DISCORD_CLIENT_SECRET=${{ secrets.DISCORD_CLIENT_SECRET }}" >> .env
+          echo "DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}" >> .env
+          echo "DISCORD_GUILD_ID=${{ secrets.DISCORD_GUILD_ID }}" >> .env
+
+      - name: Build App Docker Image and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/asii-projects/fiipractic-app:latest
+            ghcr.io/asii-projects/fiipractic-app:${{ env.tag }}
+
+  # Make sure to propagate the changes of this job to manual release workflow
+  pull_and_release:
+    name: Release
+    runs-on: self-hosted
+    needs:
+      - build_and_deploy
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create .env for Deployment
+        run: |
+          echo "APP_IMAGE_TAG=ghcr.io/asii-projects/fiipractic-app:${{ env.tag }}" >> .env
+          echo "APP_PORT=${{ secrets.APP_PORT }}" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
+          echo "NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}" >> .env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
+          echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> .env
+          echo "SMTP_SECURE=${{ secrets.SMTP_SECURE }}" >> .env
+          echo "SMTP_HOST=${{ secrets.SMTP_HOST }}" >> .env
+          echo "SMTP_PORT=${{ secrets.SMTP_PORT }}" >> .env
+          echo "SMTP_USER=${{ secrets.SMTP_USER }}" >> .env
+          echo "SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}" >> .env
+          echo "SMTP_FROM=${{ secrets.SMTP_FROM }}" >> .env
+          echo "SMSO_API_KEY=${{ secrets.SMSO_API_KEY }}" >> .env
+          echo "UPSTASH_URL=${{ secrets.UPSTASH_URL }}" >> .env
+          echo "QSTASH_TOKEN=${{ secrets.QSTASH_TOKEN }}" >> .env
+          echo "QSTASH_CURRENT_SIGNING_KEY=${{ secrets.QSTASH_CURRENT_SIGNING_KEY }}" >> .env
+          echo "QSTASH_NEXT_SIGNING_KEY=${{ secrets.QSTASH_NEXT_SIGNING_KEY }}" >> .env
+          echo "QSTASH_TOPIC=${{ secrets.QSTASH_TOPIC }}" >> .env
+          echo "DISCORD_CLIENT_ID=${{ secrets.DISCORD_CLIENT_ID }}" >> .env
+          echo "DISCORD_CLIENT_SECRET=${{ secrets.DISCORD_CLIENT_SECRET }}" >> .env
+          echo "DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}" >> .env
+          echo "DISCORD_GUILD_ID=${{ secrets.DISCORD_GUILD_ID }}" >> .env
+
+      - name: Run the new Version of The Apps
+        run: |
+          make start-prod
+
+      - name: Remove Unused Images
+        run: |
+          make remove-unused-images
+
+      - name: Generate Summary
+        run: |
+          echo "### Release Successful" >> $GITHUB_STEP_SUMMARY
+          echo "The following applications released" >> $GITHUB_STEP_SUMMARY
+          echo "* FIIPractic:${{ env.tag }}" >> $GITHUB_STEP_SUMMARY
