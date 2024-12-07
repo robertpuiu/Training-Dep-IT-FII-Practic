@@ -3,8 +3,10 @@ import Image from "next/image";
 import type { FC } from "react";
 
 const TrainersPage: FC = async () => {
+  let trainers = await fetch("/api/traineri").then((res) => res.json());
+
   return (
-    <div>
+    <div> 
       <Card>
         <CardHeader>
           <CardTitle>{/* Title me pls */}</CardTitle>
