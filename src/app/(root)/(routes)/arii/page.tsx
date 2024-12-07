@@ -23,9 +23,9 @@ const AreasPage: FC = async () => {
     console.error("Error fetching areas:", error);
     }
   return (
-    <div className="grid md:grid-cols-2 gap-4 grid-cols-1 p-4">
+    <div className="grid md:grid-cols-2 gap-4 grid-cols-1 p-4 place-items-center">
       {areas.map((area: any, index: number) => (
-        <Card key={index} >
+        <Card key={index} className = "rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-[350px]">
           <CardHeader>
             <CardTitle className="tracking-tight text-2xl font-semibold flex justify-center">{area.name}</CardTitle> {/* Replace 'name' with the correct field */}
             <CardContent className="flex justify-center p-0">
